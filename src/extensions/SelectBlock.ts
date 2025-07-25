@@ -1,5 +1,5 @@
 import { Extension, type RawCommands } from '@tiptap/react'
-import { EditorState, NodeSelection, Transaction } from 'prosemirror-state'
+import { EditorState, TextSelection, Transaction } from 'prosemirror-state'
 
 export const SelectBlockExtension = Extension.create({
   name: 'selectBlock',
@@ -15,18 +15,26 @@ export const SelectBlockExtension = Extension.create({
           state: EditorState
           dispatch?: (tr: Transaction) => void
         }) => {
-          const { selection } = state
-          const depth = selection.$from.depth
+          const { selection, doc } = state
+          const $from = selection.$from
 
-          if (depth === 0) {
-            return false
+          let from = $from.start(0)
+          let to = $from.end(0)
+
+          for (let depth = $from.depth; depth > 0; depth--) {
+            const node = $from.node(depth)
+
+            if (node.isBlock) {
+              from = $from.before(depth)
+              to = $from.after(depth)
+            }
           }
-
-          const pos = selection.$from.before(depth)
 
           if (dispatch) {
             dispatch(
-              state.tr.setSelection(NodeSelection.create(state.doc, pos))
+              state.tr
+                .setSelection(TextSelection.create(doc, from, to))
+                .scrollIntoView()
             )
           }
 

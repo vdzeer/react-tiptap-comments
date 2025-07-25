@@ -1,5 +1,5 @@
-import { useThreads } from '@liveblocks/react/suspense'
 import { AnchoredThreads, FloatingThreads } from '@liveblocks/react-tiptap'
+import type { BaseMetadata, ThreadData } from '@liveblocks/client'
 import type { Editor } from '@tiptap/react'
 import styles from './Threads.module.css'
 import { CommentIcon } from '../../icons'
@@ -7,22 +7,11 @@ import { useIsMobile } from '../../hooks'
 
 export function Threads({
   editor,
-  userType,
+  threads,
 }: {
   editor: Editor | null
-  userType: string
+  threads: ThreadData<BaseMetadata>[]
 }) {
-  const { threads } = useThreads(
-    userType === 'internal'
-      ? {}
-      : {
-          query: {
-            metadata: {
-              type: userType,
-            },
-          },
-        }
-  )
   const isMobile = useIsMobile()
 
   if (!threads || !editor) {

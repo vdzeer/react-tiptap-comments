@@ -211,3 +211,27 @@ h3 .tiptap-code {
 .hide-collaboration-cursor .collaboration-cursor__label {
   display: none;
 }
+
+.lb-hide-comment-mark {
+  background: none !important;
+  box-shadow: none !important;
+  border-bottom: none !important;
+  color: inherit !important;
+}
+
+.lb-root.lb-tiptap-thread-mark:has(.lb-hide-comment-mark) {
+  background: none !important;
+  box-shadow: none !important;
+  border-bottom: none !important;
+  pointer-events: none !important;
+  text-decoration: none !important;
+}
+
+.lb-root.lb-tiptap-thread-mark:has(.lb-hide-comment-mark)
+  .lb-tiptap-thread-mark-selected {
+  background: none !important;
+  box-shadow: none !important;
+  border-bottom: none !important;
+  pointer-events: none !important;
+  text-decoration: none !important;
+}

@@ -14,29 +14,54 @@ import { SelectBlockExtension } from '../../extensions/SelectBlock'
 import { starterKitOptions } from '../../constants/editor'
 import { addBlockComment } from '../../utils/editor'
 import type { EditorProps } from '../../types/editor'
+import { useThreads } from '@liveblocks/react/suspense'
+import { FilterLiveblocksCommentMark } from '../../extensions/FilterLiveblocksCommentMark'
+import { useMemo } from 'react'
 
 export function Editor({ userType, renderHeader }: EditorProps) {
   const liveblocks = useLiveblocksExtension()
 
-  const editor = useEditor({
-    editorProps: {
-      attributes: {
-        class: styles.editor,
+  const { threads } = useThreads(
+    userType === 'internal'
+      ? {}
+      : {
+          query: {
+            metadata: {
+              type: userType,
+            },
+          },
+        }
+  )
+  const allowedThreadIds = useMemo(
+    () => (threads ? threads.map((t) => t.metadata?.highlightId || t.id) : []),
+    [threads]
+  )
+
+  const editor = useEditor(
+    {
+      editorProps: {
+        attributes: {
+          class: styles.editor,
+        },
       },
+      extensions: [
+        liveblocks,
+        StarterKit.configure({
+          history: false,
+          ...starterKitOptions,
+        }),
+        Placeholder.configure({
+          placeholder: 'Start writing…',
+          emptyEditorClass: 'tiptap-empty',
+        }),
+        SelectBlockExtension,
+        FilterLiveblocksCommentMark.configure({
+          allowedThreadIds: allowedThreadIds.map((id) => id.toString()),
+        }),
+      ],
     },
-    extensions: [
-      liveblocks,
-      StarterKit.configure({
-        history: false,
-        ...starterKitOptions,
-      }),
-      Placeholder.configure({
-        placeholder: 'Start writing…',
-        emptyEditorClass: 'tiptap-empty',
-      }),
-      SelectBlockExtension,
-    ],
-  })
+    [allowedThreadIds]
+  )
 
   return (
     <div className={styles.container}>
@@ -64,7 +89,7 @@ export function Editor({ userType, renderHeader }: EditorProps) {
               metadata={{ type: userType }}
             />
             <div className={styles.threads}>
-              <Threads editor={editor} userType={userType} />
+              <Threads editor={editor} threads={threads} />
             </div>
           </div>
         </div>
