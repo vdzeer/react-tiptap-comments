@@ -44,3 +44,19 @@
     margin-top: 0;
   }
 }
+
+/* Thread Item */
+.threadItem {
+  margin-bottom: var(--spacing);
+  border: 1px solid var(--color-border-thread);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing);
+  background: var(--color-bg);
+  transition: border-color 0.2s;
+}
+.threadItem:last-child {
+  margin-bottom: 0;
+}
+.threadItem:hover {
+  border-color: #b3b3b3;
+}

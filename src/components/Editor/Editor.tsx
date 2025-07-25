@@ -7,33 +7,25 @@ import {
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { Placeholder } from '@tiptap/extension-placeholder'
-import { Threads } from '../Threads'
 import styles from './Editor.module.css'
 import { Icon } from '@liveblocks/react-ui'
 import { SelectBlockExtension } from '../../extensions/SelectBlock'
 import { starterKitOptions } from '../../constants/editor'
 import { addBlockComment } from '../../utils/editor'
 import type { EditorProps } from '../../types/editor'
-import { useThreads } from '@liveblocks/react/suspense'
+import { useMemo, forwardRef, useImperativeHandle } from 'react'
 import { FilterLiveblocksCommentMark } from '../../extensions/FilterLiveblocksCommentMark'
-import { useMemo } from 'react'
 
-export function Editor({ userType, renderHeader }: EditorProps) {
-  const liveblocks = useLiveblocksExtension()
+export const Editor = forwardRef(function Editor(
+  { userType, threads, field }: EditorProps,
+  ref
+) {
+  const liveblocks = useLiveblocksExtension({
+    field,
+  })
 
-  const { threads } = useThreads(
-    userType === 'internal'
-      ? {}
-      : {
-          query: {
-            metadata: {
-              type: userType,
-            },
-          },
-        }
-  )
   const allowedThreadIds = useMemo(
-    () => (threads ? threads.map((t) => t.metadata?.highlightId || t.id) : []),
+    () => (threads ? threads.map((t) => t.id) : []),
     [threads]
   )
 
@@ -63,9 +55,10 @@ export function Editor({ userType, renderHeader }: EditorProps) {
     [allowedThreadIds]
   )
 
+  useImperativeHandle(ref, () => editor, [editor])
+
   return (
     <div className={styles.container}>
-      <div className={styles.editorHeader}>{renderHeader()}</div>
       <Toolbar editor={editor} className={styles.editorToolbar}>
         <Toolbar.BlockSelector />
         <Toolbar.SectionInline />
@@ -82,18 +75,19 @@ export function Editor({ userType, renderHeader }: EditorProps) {
         <FloatingToolbar editor={editor} />
         <div className={styles.editorContainerOffset}>
           <div className={styles.editorContainer}>
-            <EditorContent editor={editor} className={styles.editor} />
+            <EditorContent
+              editor={editor}
+              className={styles.editor}
+              onBlur={() => editor?.commands.selectThread(null)}
+            />
             <FloatingComposer
               editor={editor}
-              style={{ width: 350 }}
-              metadata={{ type: userType }}
+              className={styles.floatingComposerWidth}
+              metadata={{ highlightId: field, type: userType }}
             />
-            <div className={styles.threads}>
-              <Threads editor={editor} threads={threads} />
-            </div>
           </div>
         </div>
       </div>
     </div>
   )
-}
+})

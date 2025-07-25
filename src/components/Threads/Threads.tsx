@@ -1,24 +1,20 @@
-import { AnchoredThreads, FloatingThreads } from '@liveblocks/react-tiptap'
 import type { BaseMetadata, ThreadData } from '@liveblocks/client'
-import type { Editor } from '@tiptap/react'
 import styles from './Threads.module.css'
 import { CommentIcon } from '../../icons'
-import { useIsMobile } from '../../hooks'
+import { Thread } from '@liveblocks/react-ui'
 
 export function Threads({
-  editor,
   threads,
+  handleThreadClick,
 }: {
-  editor: Editor | null
   threads: ThreadData<BaseMetadata>[]
+  handleThreadClick: (thread: ThreadData<BaseMetadata>) => void
 }) {
-  const isMobile = useIsMobile()
-
-  if (!threads || !editor) {
+  if (!threads) {
     return null
   }
 
-  if (!isMobile && threads.length === 0) {
+  if (threads.length === 0) {
     return (
       <div className={styles.noComments}>
         <div className={styles.noCommentsHeader}>No comments yet</div>
@@ -30,9 +26,12 @@ export function Threads({
     )
   }
 
-  return isMobile ? (
-    <FloatingThreads threads={threads} editor={editor} />
-  ) : (
-    <AnchoredThreads threads={threads} editor={editor} style={{ width: 350 }} />
-  )
+  return threads.map((thread) => (
+    <Thread
+      key={thread.id}
+      thread={thread}
+      onClick={() => handleThreadClick(thread)}
+      className={styles.threadItem}
+    />
+  ))
 }

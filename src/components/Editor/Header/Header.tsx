@@ -1,12 +1,12 @@
 import React from 'react'
-import type { User, UserType } from '../../../types/user'
+import type { User } from '../../../types/user'
+import styles from '../Editor.module.css'
 
 interface HeaderProps {
   userId: string
   users: User[]
   onChange: (id: string) => void
   avatar: string
-  userType: UserType
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -15,20 +15,12 @@ export const Header: React.FC<HeaderProps> = ({
   onChange,
   avatar,
 }) => (
-  <div
-    style={{
-      padding: 16,
-      background: '#fff',
-      display: 'flex',
-      alignItems: 'center',
-      gap: 16,
-    }}
-  >
-    <span style={{ fontWeight: 500 }}>User:</span>
+  <div className={styles.headerContainer}>
+    <span className={styles.userLabel}>User:</span>
     <select
       value={userId}
       onChange={(e) => onChange(e.target.value)}
-      style={{ fontSize: 16, padding: 4 }}
+      className={styles.userSelect}
     >
       {users.map((u) => (
         <option key={u.id} value={u.id}>
@@ -36,10 +28,6 @@ export const Header: React.FC<HeaderProps> = ({
         </option>
       ))}
     </select>
-    <img
-      src={avatar}
-      alt='User avatar'
-      style={{ width: 32, height: 32, borderRadius: '50%' }}
-    />
+    <img src={avatar} alt='User avatar' className={styles.userAvatar} />
   </div>
 )

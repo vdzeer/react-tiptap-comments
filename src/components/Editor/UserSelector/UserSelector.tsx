@@ -1,5 +1,6 @@
 import React from 'react'
 import type { User } from '../../../types/user'
+import styles from '../Editor.module.css'
 
 interface UserSelectorProps {
   userId: string
@@ -15,7 +16,7 @@ export const UserSelector: React.FC<UserSelectorProps> = ({
   <select
     value={userId}
     onChange={(e) => onChange(e.target.value)}
-    style={{ fontSize: 16, padding: 4 }}
+    className={styles.userSelect}
   >
     {users.map((u) => (
       <option key={u.id} value={u.id}>
